@@ -1,210 +1,300 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>XP CHECK</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-  <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial, Helvetica, sans-serif;
-    }
+<title>XP CHECK</title>
 
-    body{
-      background:#070707;
-      color:white;
-      min-height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:20px;
-    }
+<style>
 
-    .card{
-      width:100%;
-      max-width:420px;
-      background:#111;
-      border:1px solid #2a2a2a;
-      border-radius:24px;
-      padding:30px;
-      box-shadow:0 0 40px rgba(255,255,255,0.05);
-    }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
 
-    h1{
-      text-align:center;
-      margin-bottom:10px;
-      font-size:36px;
-      letter-spacing:3px;
-    }
+body{
+background:#070707;
+color:white;
+padding:20px;
+}
 
-    .sub{
-      text-align:center;
-      color:#888;
-      margin-bottom:30px;
-    }
+.container{
+max-width:500px;
+margin:auto;
+}
 
-    input{
-      width:100%;
-      padding:16px;
-      border:none;
-      border-radius:14px;
-      background:#1b1b1b;
-      color:white;
-      font-size:16px;
-      outline:none;
-      margin-bottom:20px;
-    }
+.title{
+text-align:center;
+font-size:40px;
+font-weight:bold;
+margin-top:20px;
+}
 
-    button{
-      width:100%;
-      padding:16px;
-      border:none;
-      border-radius:14px;
-      background:white;
-      color:black;
-      font-size:16px;
-      font-weight:bold;
-      cursor:pointer;
-      transition:0.2s;
-    }
+.sub{
+text-align:center;
+color:#888;
+margin-bottom:40px;
+}
 
-    button:hover{
-      transform:scale(1.02);
-    }
+.question{
+background:#111;
+padding:25px;
+border-radius:20px;
+margin-bottom:25px;
+border:1px solid #222;
+}
 
-    .loading{
-      display:none;
-      text-align:center;
-      margin-top:25px;
-      color:#999;
-    }
+.question h2{
+font-size:20px;
+margin-bottom:20px;
+}
 
-    .result{
-      display:none;
-      margin-top:30px;
-      padding:20px;
-      background:#1a1a1a;
-      border-radius:18px;
-      text-align:center;
-      animation:show 0.4s ease;
-    }
+.option{
+background:#1b1b1b;
+padding:15px;
+border-radius:12px;
+margin-bottom:12px;
+cursor:pointer;
+transition:0.2s;
+border:1px solid transparent;
+}
 
-    .score{
-      font-size:72px;
-      font-weight:bold;
-      margin:10px 0;
-    }
+.option:hover{
+border:1px solid white;
+transform:scale(1.02);
+}
 
-    .tag{
-      display:inline-block;
-      margin-top:10px;
-      padding:8px 16px;
-      border-radius:999px;
-      background:#2b2b2b;
-      color:#fff;
-      font-size:14px;
-    }
+.selected{
+background:white;
+color:black;
+}
 
-    @keyframes show{
-      from{
-        opacity:0;
-        transform:translateY(10px);
-      }
-      to{
-        opacity:1;
-        transform:translateY(0);
-      }
-    }
-  </style>
+button{
+width:100%;
+padding:18px;
+border:none;
+border-radius:15px;
+background:white;
+color:black;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+margin-top:20px;
+}
+
+.result{
+display:none;
+background:#111;
+padding:30px;
+border-radius:20px;
+margin-top:30px;
+text-align:center;
+}
+
+.score{
+font-size:80px;
+font-weight:bold;
+margin:20px 0;
+}
+
+.tag{
+font-size:24px;
+margin-bottom:10px;
+}
+
+.desc{
+color:#aaa;
+line-height:1.6;
+}
+
+</style>
 </head>
 
 <body>
 
-  <div class="card">
-    <h1>XP CHECK</h1>
-    <div class="sub">
-      输入名字开始检测
-    </div>
+<div class="container">
 
-    <input id="nameInput" type="text" placeholder="输入名字..." />
+<div class="title">
+XP CHECK
+</div>
 
-    <button onclick="startCheck()">
-      开始检测
-    </button>
+<div class="sub">
+选择选项开始检测
+</div>
 
-    <div class="loading" id="loading">
-      正在扫描XP...
-    </div>
+<div id="questions"></div>
 
-    <div class="result" id="result">
-      <div id="resultName"></div>
+<button onclick="finishTest()">
+开始检测
+</button>
 
-      <div class="score" id="score">
-        98%
-      </div>
+<div class="result" id="result">
 
-      <div class="tag" id="tag">
-        危险级XP
-      </div>
-    </div>
-  </div>
+<div class="tag" id="tag"></div>
 
-  <script>
-    function startCheck(){
+<div class="score" id="score"></div>
 
-      const name =
-        document.getElementById("nameInput").value;
+<div class="desc" id="desc"></div>
 
-      if(!name){
-        alert("请输入名字");
-        return;
-      }
+</div>
 
-      const loading =
-        document.getElementById("loading");
+</div>
 
-      const result =
-        document.getElementById("result");
+<script>
 
-      loading.style.display = "block";
-      result.style.display = "none";
+const data = [
 
-      setTimeout(()=>{
+{
+title:"你最喜欢的角色类型？",
+options:[
+["高冷",20],
+["病娇",40],
+["温柔",10],
+["疯批",50]
+]
+},
 
-        loading.style.display = "none";
+{
+title:"你喜欢什么关系？",
+options:[
+["纯爱",10],
+["强制爱",50],
+["相爱相杀",40],
+["日常陪伴",20]
+]
+},
 
-        const score =
-          Math.floor(Math.random()*100)+1;
+{
+title:"你的理想约会？",
+options:[
+["看电影",10],
+["深夜散步",20],
+["地下室囚禁",50],
+["海边旅行",15]
+]
+}
 
-        let tag = "";
+];
 
-        if(score > 85){
-          tag = "顶级XP";
-        }else if(score > 60){
-          tag = "危险XP";
-        }else if(score > 30){
-          tag = "普通XP";
-        }else{
-          tag = "隐藏XP";
-        }
+const answers = [];
 
-        document.getElementById("resultName")
-          .innerText = name + " 的XP值";
+const container =
+document.getElementById("questions");
 
-        document.getElementById("score")
-          .innerText = score + "%";
+data.forEach((q,index)=>{
 
-        document.getElementById("tag")
-          .innerText = tag;
+const div =
+document.createElement("div");
 
-        result.style.display = "block";
+div.className = "question";
 
-      },2000);
-    }
-  </script>
+let html =
+`<h2>${index+1}. ${q.title}</h2>`;
+
+q.options.forEach((op,i)=>{
+
+html += `
+<div class="option"
+onclick="selectOption(${index},${i},this)">
+${op[0]}
+</div>
+`;
+
+});
+
+div.innerHTML = html;
+
+container.appendChild(div);
+
+});
+
+function selectOption(qIndex,oIndex,el){
+
+const parent =
+el.parentElement;
+
+const options =
+parent.querySelectorAll(".option");
+
+options.forEach(o=>{
+o.classList.remove("selected");
+});
+
+el.classList.add("selected");
+
+answers[qIndex] =
+data[qIndex].options[oIndex][1];
+
+}
+
+function finishTest(){
+
+if(answers.length < data.length){
+
+alert("还有题目没选");
+
+return;
+
+}
+
+let total = 0;
+
+answers.forEach(v=>{
+total += v;
+});
+
+let tag = "";
+let desc = "";
+
+if(total >= 120){
+
+tag = "危险级XP";
+desc =
+"你的XP已经进入危险区域。建议重点观察。";
+
+}else if(total >= 80){
+
+tag = "高浓度XP";
+desc =
+"你有明显特殊XP倾向。";
+
+}else if(total >= 40){
+
+tag = "普通XP";
+desc =
+"属于正常范围。";
+
+}else{
+
+tag = "纯爱战士";
+desc =
+"你的XP十分健康。";
+
+}
+
+document.getElementById("result")
+.style.display = "block";
+
+document.getElementById("score")
+.innerText = total;
+
+document.getElementById("tag")
+.innerText = tag;
+
+document.getElementById("desc")
+.innerText = desc;
+
+window.scrollTo({
+top:document.body.scrollHeight,
+behavior:"smooth"
+});
+
+}
+
+</script>
 
 </body>
 </html>
